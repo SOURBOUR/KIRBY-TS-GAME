@@ -1,24 +1,36 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+import { k } from "./kaboomCtx";
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+//to avoid refetching assests once the player dies.
+async function gameSetup() {
+    k.loadSprite("assets", "./kirby-like.png", {
+        sliceX: 9,
+        sliceY: 10,
+        anims: {
+            kirbIdle: 0,
+            kirbInhaling: 1,
+            kirbFull: 2,
+            kirbInhaleEffect: { from: 3, to: 8, speed: 15, loop: true},
+            shootingStar: 9,
+            flame: {from: 36, to: 37, speed: 4, loop: true},
+            guyIdle: 18,
+            guyWalk: {from: 18, to: 19, speed: 4, loop: true},
+            bird: {from: 27, to: 28, speed: 4, loop: true},
+        },
+    });
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+    k.loadSprite("level-1", "./level-1.png");
+
+    k.scene("level-1", () => {
+        k.setGravity(2100);
+        k.add([
+            k.rect(k.width(), k.height()),
+            k.color(k.Color.fromHex("#f7d7db")),
+            k.fixed(),
+        ])
+    })
+
+    k.go("level-1");
+
+}
+
+gameSetup();
