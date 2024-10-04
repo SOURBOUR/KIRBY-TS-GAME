@@ -39,6 +39,61 @@ export function makePlayer(k: KaboomCtx, posX: number, posY: number){
 
 //player gets hit, if collision occurs and player is not 0 hp
         player.hurt();
-        await k.tween()
-    })
+//player blinking effect
+        await k.tween(
+            player.opacity,
+            0,
+            0.05,
+            (val) => (player.opacity = val),
+            k.easings.linear
+        );
+        await k.tween(
+            player.opacity,
+            1,
+            0.05,
+            (val) => (player.opacity = val),
+            k.easings.linear
+        );
+    });
+
+    player.onCollide("exit", () => {
+        k.go("level-2");
+    });
+
+    //breathing effect
+    const inhaleEffect = k.add([
+        k.sprite("assets", {anim: "kirbInhaleEffect"}),
+        k.pos(),
+        k.scale(scale),
+        k.opacity(0),
+        "inhaleEffect",
+    ]);
+
+    const inhaleZone = player.add([
+        k.area({shape: new k.Rect(k.vec2(0), 20, 4)}),
+        k.pos(),
+        "inhaleZone",
+    ])
+
+    inhaleZone.onUpdate(() => {
+        if(player.direction === "left"){
+            inhaleZone.pos = k.vec2(-14, 8);
+            inhaleEffect.pos = k.vec2(player.pos.x - 60, player.pos.y + 0);
+            inhaleEffect.flipX = true;
+            return;
+        }
+        inhaleZone.pos = k.vec2(14,8);
+        inhaleEffect.pos = k.vec2(player.pos.x + 60, player.pos.y + 0);
+        inhaleEffect.flipX = false;
+    });
+
+    //if the player falls
+    player.onUpdate(() => {
+        if(player.pos.y > 2000){
+            //resets the state and everything by going back
+            k.go("level-1");
+        }
+    });
+
+    return player;
 }
